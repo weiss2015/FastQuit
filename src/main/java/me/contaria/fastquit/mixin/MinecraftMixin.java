@@ -48,12 +48,12 @@ public abstract class MinecraftMixin {
         if (FastQuit.CONFIG.renderSavingScreen && this.isLocalServer) {
             original.call(client, screen);
         } else {
-            client.setScreen(screen);
+            client.gui.setScreen(screen);
         }
     }
 
     @Inject(
-            method = "destroy",
+            method = "exitWorldAndClose",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/Minecraft;disconnectWithProgressScreen()V",
@@ -65,7 +65,7 @@ public abstract class MinecraftMixin {
     }
 
     @Inject(
-            method = "crash(Lnet/minecraft/client/Minecraft;Ljava/io/File;Lnet/minecraft/CrashReport;)V",
+            method = "crash(Lnet/minecraft/client/Minecraft;Ljava/io/File;Lnet/minecraft/CrashReport;I)V",
             at = @At("HEAD")
     )
     private static void fastquit$waitForSaveOnCrash(CallbackInfo ci) {

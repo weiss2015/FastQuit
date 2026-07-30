@@ -130,7 +130,7 @@ public final class FastQuit implements ClientModInitializer {
             return;
         }
 
-        Screen oldScreen = client.screen;
+        Screen oldScreen = client.gui.screen();
 
         Component stillSaving = TextHelper.translatable("fastquit.screen.waiting", String.join("\" & \"", servers.stream().map(server -> server.getWorldData().getLevelName()).toList()));
         log(stillSaving.getString());
@@ -138,7 +138,7 @@ public final class FastQuit implements ClientModInitializer {
         servers.forEach(server -> server.getRunningThread().setPriority(Thread.NORM_PRIORITY));
 
         try {
-            client.setScreen(new WaitingScreen(stillSaving, cancellable));
+            client.gui.setScreen(new WaitingScreen(stillSaving, cancellable));
 
             while (servers.stream().anyMatch(server -> !server.isShutdown())) {
                 if (cancellable != null && cancellable.isCancelled()) {
@@ -151,12 +151,7 @@ public final class FastQuit implements ClientModInitializer {
                 ((MinecraftAccessor) client).fastquit$runTick(false);
             }
         } finally {
-            // compatibility with "WorldGen" mod
-            if (oldScreen != null && oldScreen.getClass().getName().equals("caeruleusTait.WorldGen.gui.screens.WGConfigScreen")) {
-                client.screen = oldScreen;
-            } else {
-                client.setScreenAndShow(oldScreen);
-            }
+            client.setScreenAndShow(oldScreen);
         }
     }
 
